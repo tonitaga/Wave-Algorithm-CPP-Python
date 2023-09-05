@@ -1,10 +1,20 @@
+//
+//   File:    wave_algorithm.h
+//   Author: [Gubaydullin Nurislam / School 21]
+//
+//   Description:
+//      This file contains the implementation of the WaveAlgorithm class,
+//      which implements the Wave Algorithm for finding the shortest path in a matrix.
+//      It also includes the Pair class, which represents a pair of values (row, column).
+//
+//   School21 Algorithms Club Quote:
+//      "Building innovative solutions for efficient algorithms."
+//
+
 #ifndef WAVE_ALGORITHM_WAVE_ALGORITHM_H_
 #define WAVE_ALGORITHM_WAVE_ALGORITHM_H_
 
-#include <vector>
-#include <iomanip>
-#include <iostream>
-#include <type_traits>
+#include <bits/stdc++.h>
 
 template <typename T>
 using Matrix = std::vector<std::vector<T>>;
@@ -17,53 +27,72 @@ struct Point {
     Point(std::size_t r, std::size_t c) : row(r), col(c) {};
 };
 
+
+/**
+* @brief Class implementing the Wave Algorithm for pathfinding in a matrix.
+* @tparam T The type of elements in the matrix. Must be a fundamental type.
+*/
+template <typename T>
 class WaveAlgorithm {
+    static_assert(std::is_fundamental_v<T>, "template parameter T must be fundamental");
 public:
-    template <typename T>
-    std::vector<Point> getPath(const Matrix<T> &matrix, Point from, Point to, T empty) {
-        static_assert(std::is_fundamental_v<T>, "template parameter T must be fundamental");
+    /**
+    * @brief Constructor for the WaveAlgorithm class.
+    * @param matrix The matrix representing the environment.
+    * @param from The starting point for pathfinding.
+    * @param to The target point for pathfinding.
+    * @param empty The value representing empty cells in the matrix.
+    */
+    WaveAlgorithm(const Matrix<T> &matrix, Point from, Point to, T empty)
+        : matrix_(matrix), start_(from), finish_(to), empty_(empty) {};
 
-        if (!PointsIsValid(matrix, from, to))
-            return {};
-
-        InitializeStartState(matrix, from);
+    /**
+    * @brief Finds the path from the starting point to the target point using the Wave Algorithm.
+    * @return A vector of points representing the path from start to finish.
+     * If no path is found, an empty vector is returned.
+    */
+    std::vector<Point> getPath() {
+        InitializeStartState();
 
         while (!old_wave_.empty())
-            if (StepWave(matrix, to, empty))
+            if (StepWave())
                 break;
 
-        DebugLengthMap(3);
-
-        return MakePath(matrix, to, empty);
+        return MakePath();
     }
 
 private:
-    template <typename T>
-    void InitializeStartState(const Matrix<T> &matrix, Point from) {
+    /**
+    * @brief Initializes the starting state for the algorithm.
+    */
+    void InitializeStartState() {
         wave_.clear();
         wave_step_ = 0;
-        old_wave_  = std::vector<Point>{from};
+        old_wave_  = std::vector<Point>{start_};
 
-        const auto row_length = matrix.empty() ? 0 : matrix[0].size();
+        const auto row_length = matrix_.empty() ? 0 : matrix_[0].size();
 
-        length_map_ = Matrix<T>(matrix.size(), std::vector<int>(row_length, -1));
-        length_map_[from.row][from.col] = wave_step_;
+        length_map_ = Matrix<T>(matrix_.size(), std::vector<int>(row_length, -1));
+        length_map_[start_.row][start_.col] = wave_step_;
     }
 
-    template <typename T>
-    bool StepWave(const Matrix<T> &matrix, Point to, T empty) {
+    /**
+     * @brief Performs a single step of the wave expansion.
+     * @return True if the target point is reached, false otherwise.
+     */
+    bool StepWave() {
         ++wave_step_;
 
         for (auto [row, col] : old_wave_) {
-            auto neighbors = getNeighbors(matrix, {row, col});
+            auto neighbors = getNeighbors({row, col});
             for (auto [x, y] : neighbors) {
-                if (matrix[x][y] == empty) {
+                if (matrix_[x][y] == empty_) {
                     if (length_map_[x][y] == -1) {
                         wave_.emplace_back(x, y);
                         length_map_[x][y] = wave_step_;
                     }
 
-                    if (x == to.row and y == to.col)
+                    if (x == finish_.row and y == finish_.col)
                         return true;
                 }
             }
@@ -73,86 +102,65 @@ private:
         return false;
     }
 
-    template <typename T>
-    std::vector<Point> getNeighbors(const Matrix<T> &matrix, Point current) {
+    /**
+     * @brief Retrieves the neighbors of a given position in the matrix.
+     * @param position The position for which to find neighbors.
+     * @return A vector of neighboring points.
+     */
+    std::vector<Point> getNeighbors(Point position) {
         std::vector<Point> neighbors;
         neighbors.reserve(4); // Von Neumann's neighborhood
 
-        auto [row, col] = current;
+        auto [row, col] = position;
 
-        if (col - 1 >= 0)
-            neighbors.emplace_back(row, col - 1);
-        if (col + 1 < matrix[0].size())
-            neighbors.emplace_back(row, col + 1);
         if (row - 1 >= 0)
             neighbors.emplace_back(row - 1, col);
-        if (row + 1 < matrix.size())
+        if (row + 1 < matrix_.size())
             neighbors.emplace_back(row + 1, col);
+        if (col - 1 >= 0)
+            neighbors.emplace_back(row, col - 1);
+        if (col + 1 < matrix_[0].size())
+            neighbors.emplace_back(row, col + 1);
 
-        neighbors.shrink_to_fit();
         return neighbors;
     }
 
-    template<typename T>
-    std::vector<Point> MakePath(const Matrix<T> &matrix, Point to, T empty) {
-        if (length_map_[to.row][to.col] == -1)
+    /**
+     * @brief Constructs the path from the length map.
+     * @return A vector of points representing the path from start to finish.
+     */
+    std::vector<Point> MakePath() {
+        if (length_map_[finish_.row][finish_.col] == -1)
             return {};
 
-        std::vector<Point> path;
-        path.reserve(length_map_[to.row][to.col] + 1);
-        path.push_back(to);
+        auto [row, col] = finish_;
 
-        auto [row, col] = to;
+        std::vector<Point> path;
+        path.reserve(length_map_[row][col] + 1);
+        path.push_back(finish_);
 
         while (length_map_[row][col] != 0) {
-            auto compare_var = length_map_[row][col];
-            auto neighbors = getNeighbors(matrix, {row, col});
+            auto compare = length_map_[row][col];
+            auto neighbors = getNeighbors({row, col});
 
             for (auto [x, y] : neighbors) {
-                if (length_map_[x][y] + 1 == compare_var and matrix[x][y] == empty) {
-                    row = x;
-                    col = y;
+                if (length_map_[x][y] + 1 == compare and matrix_[x][y] == empty_) {
+                    row = x, col = y;
+                    path.emplace_back(row, col);
                     break;
                 }
             }
-
-
-            path.emplace_back(row, col);
         }
 
         return path;
     }
 
-    template<typename T>
-    bool PointsIsValid(const Matrix<T> &matrix, Point from, Point to) {
-        auto [frow, fcol] = from;
-        auto [trow, tcol] = to;
-
-        const int rows = matrix.size();
-        const int cols = matrix.empty() ? 0 : matrix[0].size();
-
-        return frow >= 0 and frow < rows and
-               fcol >= 0 and fcol < cols and
-               trow >= 0 and trow < rows and
-               tcol >= 0 and tcol < cols;
-    }
-
-    void DebugLengthMap(int width) {
-        for (const auto &row : length_map_) {
-            for (const auto &row_item : row) {
-                if (row_item == -1)
-                    std::cout << std::setw(width) << 'X';
-                else
-                    std::cout << std::setw(width) << row_item;
-            }
-            std::cout << std::endl;
-        }
-    }
-
 private:
-    Matrix<int> length_map_;
+    Matrix<int> length_map_, matrix_;
     std::vector<Point> old_wave_, wave_;
+    Point start_, finish_;
     int wave_step_ {};
+    T empty_;
 };
 
 #endif // WAVE_ALGORITHM_WAVE_ALGORITHM_H_

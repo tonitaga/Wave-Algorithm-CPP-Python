@@ -9,11 +9,11 @@ int main() {
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
     };
 
-    WaveAlgorithm wave;
-    auto path = wave.getPath(matrix, {0, 0}, {2, 27}, 0);
+    WaveAlgorithm wave(matrix, {0, 0}, {2, 27}, 0);
+    auto path = wave.getPath();
 
     for (auto point : path)
-        printf("[%d, %d]\n", point.row, point.col);
+        printf("[%d, %d] -> ", point.row, point.col);
 
     return EXIT_SUCCESS;
 }
