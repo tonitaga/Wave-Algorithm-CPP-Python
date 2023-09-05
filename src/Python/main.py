@@ -1,5 +1,4 @@
-from wave_algorithm import WaveAlgorithm
-from wave_algorithm import Point
+from wave_algorithm import *
 
 if __name__ == '__main__':
     matrix = [
@@ -10,8 +9,8 @@ if __name__ == '__main__':
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     ]
 
-    wave_algorithm = WaveAlgorithm()
-    path = wave_algorithm.get_path(matrix, Point(0, 0), Point(2, 27), 0)
+    wave_algorithm = WaveAlgorithm(matrix, Pair(0, 0), Pair(2, 27), 0)
+    path = wave_algorithm.get_path()
 
-    for point in path:
-        print(f'[{point.row}, {point.col}]')
+    for row, col in path:
+        print(f'[{row}, {col}]')
