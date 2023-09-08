@@ -3,7 +3,7 @@
 ---
 
 <p align="center">
-<img src="misc/images/path.gif" alt="Wave-Algorithm-CPP-Python" style="width: 20vw; min-width: 300px;" />
+<img src="misc/images/path.gif" alt="Wave-Algorithm-CPP-Python" style="width: 45vw; min-width: 600px;" />
 </p>
 
 ---
