@@ -2,7 +2,7 @@
 
 ---
 
-[Wave Algorithms School21 version](https://www.youtube.com/watch?v=GuOl91bw500&t=1564s)
+[Wave Algorithms School21 version]((https://youtu.be/GuOl91bw500?si=hGgJxHhbcRQU-SQn)
 
 ---
 
