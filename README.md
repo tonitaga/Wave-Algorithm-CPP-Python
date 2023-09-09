@@ -2,6 +2,10 @@
 
 ---
 
+[Wave Algorithms School21 version](https://www.youtube.com/watch?v=GuOl91bw500&t=1564s)
+
+---
+
 <p align="center">
 <img src="misc/images/path.gif" alt="Wave-Algorithm-CPP-Python" style="width: 45vw; min-width: 600px;" />
 </p>
